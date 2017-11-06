@@ -26,6 +26,8 @@ public class ObjectCircling {
 	static double mLeftY = 0.0;
 	static double mRightX = 0.0;
 	static double mRightY = 0.0;
+	static boolean mHasExitedHitpoint = false;
+	static double mHitpoint = new double[2];
 	static EV3MediumRegulatedMotor left;
 	static EV3MediumRegulatedMotor right;
 	static SensorMode touchLeft;
@@ -54,6 +56,7 @@ public class ObjectCircling {
 		Sound.beep();
 		Button.ENTER.waitForPressAndRelease();
 		System.out.println("Moving forward");
+		long timestamp = System.nanoTime();
 		left.startSynchronization();
 		right.forward();
 		left.forward();
@@ -71,6 +74,8 @@ public class ObjectCircling {
 		right.stop();
 		left.stop();
 		left.endSynchronization();
+		updateCoordsLinear(timestamp);
+		mHitpoint = getCenterCoords();
 
 		//back up 15cm
 		Sound.beep();
@@ -129,8 +134,8 @@ public class ObjectCircling {
 			System.out.print("E " + newerror + " " + errordiff+ " ");
 
 			//according to the error difference, adjust the angle with one wheel set to speed 0
-			if ( abs(errordiff) > terminatediff || newerror > infinity ){//end of the wall, break loop
-				
+			if ( mHasExcitedHitpoint && (Math.abs(getCenterCoords()[0] - mHitpoint[0]) < .15) 
+					&&  (Math.abs(getCenterCoords()[1] - mHitpoint[0]) < .15{//end of the wall, break loop
 				break;
 			}else {
 				if(newerror< -1*setbuffer || newerror> setbuffer){//if drifting left from the offset turn right
@@ -184,7 +189,10 @@ public class ObjectCircling {
 		left.stop();
 		left.endSynchronization();
 		
-		//rotate to bump into wall, then back up d
+		//rotate to face home, go home
+		rotateAngle(-mOrientation - PI/2.0);
+		double distanceToHome = sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1])
+		move(distanceToHome);
 	}
 	
 	private static void move(float distanceToGo, boolean wallReturn) {
@@ -192,6 +200,7 @@ public class ObjectCircling {
 	}
 	
 	private static void move(float distanceToGo, int speed, boolean wallReturn) {
+		long timestamp = System.nanoTime();
 		left.setSpeed(speed);
 		right.setSpeed(speed);
 		double numRotations = ( distanceToGo / (RADIUS * 2.0 * PI));
@@ -221,6 +230,7 @@ public class ObjectCircling {
 				}
 			}
 		}
+		updateCoordsLinear(timestamp);
 	}
 
 
@@ -345,5 +355,8 @@ public class ObjectCircling {
 		mRightY += distance * Math.sin(mOrientation);
 	}
 	
+	private static double[] getCenterCoords(){
+		return new double{(mLeftX + mRightX)/2.0, (mLeftY + mRightY)/2.0 }
+	}
 
 }

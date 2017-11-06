@@ -45,7 +45,7 @@ public class ObjectCircling {
 		touchLeftSample = new float[touchLeft.sampleSize()];
 		touchRightSample = new float[touchRight.sampleSize()];
 		sonicSample = new float[sonic.sampleSize()];
-
+		//start and head forward
 		Sound.beep();
 		Button.ENTER.waitForPressAndRelease();
 		System.out.println("Moving forward");
@@ -54,13 +54,14 @@ public class ObjectCircling {
 		left.forward();
 		left.endSynchronization();
 		
-		//stop when you hit a wall
+		//stop and beep when you hit a wall
 		touchLeft.fetchSample(touchLeftSample, 0);
 		touchRight.fetchSample(touchRightSample, 0);
 		while(touchLeftSample[0] == 0 || touchRightSample[0] == 0){
 			touchLeft.fetchSample(touchLeftSample, 0);
 			touchRight.fetchSample(touchRightSample, 0);
 		}
+		Sound.beep();
 		left.startSynchronization();
 		right.stop();
 		left.stop();

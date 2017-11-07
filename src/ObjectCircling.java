@@ -15,7 +15,7 @@ import static java.lang.Math.*;
 public class ObjectCircling {
 
 	final static double RADIUS = .0275; // RADIUS of the tires in meters
-	final static double PI = 3.141592653589793;
+	final static double PI = 3.14159265358979385626433;
 	final static float SONAR_OFFSET = .022f; // how far the sonar is from front
 												// of robut
 	final static double AXLE_LENGTH = .122;
@@ -39,7 +39,8 @@ public class ObjectCircling {
 	
 
 	public static void main(String[] args) {
-
+		System.out.println(sin(PI/2.0));
+		System.out.println(cos(PI/2.0));
 		left = new EV3MediumRegulatedMotor(MotorPort.A);
 		right = new EV3MediumRegulatedMotor(MotorPort.D);
 		left.synchronizeWith(new EV3MediumRegulatedMotor[] { right });
@@ -75,6 +76,7 @@ public class ObjectCircling {
 		left.stop();
 		left.endSynchronization();
 		updateCoordsLinear(timestamp);
+		Button.ENTER.waitForPressAndRelease();
 
 		// back up 15cm
 		Sound.beep();
@@ -82,6 +84,7 @@ public class ObjectCircling {
 		move(-.15f, false);
 		mHitpoint = getCenterCoords();	
 		System.out.println("Hitpoint Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
+		Button.ENTER.waitForPressAndRelease();
 //		Button.ENTER.waitForPressAndRelease();
 //		double numRotations = ( .15 / (RADIUS * 2 * PI));
 //		int angle = (int) (-360.0 * numRotations);
@@ -238,7 +241,7 @@ public class ObjectCircling {
 				}
 			}
 		}
-		updateCoordsLinear(timestamp);
+		updateCoordsLinear(timestamp, distanceToGo);
 	}
 
 	private static void rotateAngle(float angle) {
@@ -423,7 +426,7 @@ public class ObjectCircling {
 		double LeftwheelRotationSpeedDegrees = (double) left.getRotationSpeed();
 		assert (RightwheelRotationSpeedDegrees == LeftwheelRotationSpeedDegrees);
 		double linearSpeed = (LeftwheelRotationSpeedDegrees  * PI / 180.0) * RADIUS;
-		double distance = ((double) (System.nanoTime() - previousTime) / 1000000000.0 ) * linearSpeed;
+		double distance = (((double) (System.nanoTime() - previousTime)) / 1000000000.0 ) * linearSpeed;
 		
 		System.out.println("distance is " + distance);
 		mLeftX += distance * Math.cos(mOrientation);
@@ -433,9 +436,20 @@ public class ObjectCircling {
 		mRightY += distance * Math.sin(mOrientation);
 		
 		// if(mHasExitedHitpoint){
-//			System.out.println("Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
+			System.out.println("Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
 		// }
 		//if it hasn't left the initialized hitpoint yet
+	}
+
+	private static void updateCoordsLinear(long previousTime, double distance){
+		mLeftX += distance * Math.cos(mOrientation);
+		mRightX += distance * Math.cos(mOrientation);
+
+		mLeftY += distance * Math.sin(mOrientation);
+		mRightY += distance * Math.sin(mOrientation);
+		
+		System.out.println("Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
+
 	}
 	
 	private static double[] getCenterCoords(){

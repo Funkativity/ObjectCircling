@@ -130,6 +130,8 @@ public class ObjectCircling {
 
 		touchLeft.fetchSample(touchLeftSample, 0);
 		touchRight.fetchSample(touchRightSample, 0);
+		boolean almosthome=false;
+		
 
 		while (forever) {
 
@@ -140,7 +142,13 @@ public class ObjectCircling {
             //according to the error difference, adjust the angle with one wheel set to speed 0
 			if (isBackHome()){//end of the wall, break loopn
 				break;
-			}else {
+			}else if(isAlmostHome() && !almosthome){
+				almosthome=true;
+				
+			}else if(almosthome && oops()){
+				break;
+			}
+			else {
 				if(newerror< -1*setbuffer || newerror> setbuffer){//if drifting left from the offset turn right
 					adjustAngle = calculateAngle(error, newerror, distanceTraveled );
 					updateCoordsLinear(timestamp);
@@ -471,7 +479,16 @@ public class ObjectCircling {
 	
 	private static boolean isBackHome() {
 		boolean isHome = mHasExitedHitpoint && getDistance(getCenterCoords(), mHitpoint) < .2f;
-		isHome = isHome && ((Math.abs(mOrientation) < PI/4.0) || (mOrientation > 7.0 * PI/4.0); 
+		isHome = isHome && ((Math.abs(mOrientation) < PI/4.0) || (mOrientation > 7.0 * PI/4.0)); 
 		return isHome;
+	}
+	private static boolean isAlmostHome() {
+		boolean isalmostHome = mHasExitedHitpoint && getDistance(getCenterCoords(), mHitpoint) < .4f;
+		return isalmostHome;
+	}
+	private static boolean oops(){
+		boolean oops = mHasExitedHitpoint &&  getDistance(getCenterCoords(), mHitpoint) > .6f;
+		return oops ;
+		
 	}
 }

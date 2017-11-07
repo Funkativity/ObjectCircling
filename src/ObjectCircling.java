@@ -213,7 +213,19 @@ public class ObjectCircling {
 		Sound.beep();
 		
 		//rotate to face home, go home
-		rotateAngle((float) (-mOrientation - Math.PI/2.0));
+		double angleHome =  -(Math.atan2(getCenterCoords()[0], getCenterCoords()[1]) - mOrientation); 
+		while (angleHome > 2.0 * Math.PI) {
+			angleHome -= 2.0 * Math.PI;
+		}
+		while (angleHome < 2.0 * Math.PI) {
+			angleHome += 2.0 * Math.PI;
+		}
+		if (angleHome > Math.PI) {
+			angleHome = angleHome - 2.0 * Math.PI;
+		} else if (angleHome < -Math.PI) {
+			angleHome = 2.0 * Math.PI + angleHome;
+		}
+		rotateAngle((float) (angleHome));
 		float distanceToHome = getDistance(getCenterCoords(),mStart);
 		//float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
 		move(distanceToHome, false);

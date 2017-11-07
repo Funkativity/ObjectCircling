@@ -410,7 +410,7 @@ public class ObjectCircling {
 	//use this after moving forward in a straight line
 	private static void updateCoordsLinear(long previousTime) {
 		if (!mHasExitedHitpoint && (mHitpoint[0] != 0.0 || mHitpoint[1] != 0.0)){
-			if(Math.abs(mHitpoint[0] - getCenterCoords()[0]) < .15 || Math.abs(mHitpoint[1] - getCenterCoords()[1]) < .15){
+			if(Math.abs(mHitpoint[0] - getCenterCoords()[0]) < .2 && Math.abs(mHitpoint[1] - getCenterCoords()[1]) < .2){
 				mHasExitedHitpoint = true;
 				System.out.println("Exited Hit Bubble");
 				Sound.beep();

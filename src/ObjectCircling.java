@@ -19,8 +19,14 @@ public class ObjectCircling {
 	final static float SONAR_OFFSET = .022f; // how far the sonar is from front
 												// of robut
 	final static double AXLE_LENGTH = .122;
-	// static double mDisplacement = 0.0;
-	static double mOrientation = 0.0;
+	
+	static double mOrientation = PI/ 2.0;
+	static double mLeftX = 0.0;
+	static double mLeftY = 0.0;
+	static double mRightX = 0.0;
+	static double mRightY = 0.0;
+	static boolean mHasExitedHitpoint = false;
+	static double mHitpoint = new double[2];
 	static EV3MediumRegulatedMotor left;
 	static EV3MediumRegulatedMotor right;
 	static SensorMode touchLeft;
@@ -29,6 +35,8 @@ public class ObjectCircling {
 	static float[] touchLeftSample;
 	static float[] touchRightSample;
 	static float[] sonicSample;
+
+	
 
 	public static void main(String[] args) {
 
@@ -48,6 +56,7 @@ public class ObjectCircling {
 		Sound.beep();
 		Button.ENTER.waitForPressAndRelease();
 		System.out.println("Moving forward");
+		long timestamp = System.nanoTime();
 		left.startSynchronization();
 		right.forward();
 		left.forward();
@@ -65,6 +74,8 @@ public class ObjectCircling {
 		right.stop();
 		left.stop();
 		left.endSynchronization();
+		updateCoordsLinear(timestamp);
+		mHitpoint = getCenterCoords();
 
 		// back up 15cm
 		Sound.beep();
@@ -81,7 +92,8 @@ public class ObjectCircling {
 
 		// turn right
 		System.out.println("turn right");
-		rotateAngle((float) (PI / 2.0));
+
+		rotateAngle((float) (-PI/2.0));
 		Sound.beep();
 
 		followWall();
@@ -115,32 +127,20 @@ public class ObjectCircling {
 
 		touchLeft.fetchSample(touchLeftSample, 0);
 		touchRight.fetchSample(touchRightSample, 0);
+
 		while (forever) {
 
 			newerror = ssample - setDistance;
 			errordiff = newerror - error; // if positive, error increase
 			System.out.print("E " + newerror + " " + errordiff + " ");
 
-			// according to the error difference, adjust the angle with one
-			// wheel set to speed 0
-			if (abs(errordiff) > terminatediff || newerror > infinity) {// end
-																		// of
-																		// the
-																		// wall,
-																		// break
-																		// loop
-
+            //according to the error difference, adjust the angle with one wheel set to speed 0
+			if ( mHasExcitedHitpoint && (Math.abs(getCenterCoords()[0] - mHitpoint[0]) < .15) 
+					&&  (Math.abs(getCenterCoords()[1] - mHitpoint[0]) < .15{//end of the wall, break loop
 				break;
-			} else {
-				if (newerror < -1 * setbuffer || newerror > setbuffer) {// if
-																		// drifting
-																		// left
-																		// from
-																		// the
-																		// offset
-																		// turn
-																		// right
-					adjustAngle = calculateAngle(error, newerror, distanceTraveled);
+			}else {
+				if(newerror< -1*setbuffer || newerror> setbuffer){//if drifting left from the offset turn right
+					adjustAngle = calculateAngle(error, newerror, distanceTraveled );
 					rotateAngle(adjustAngle);
 				}
 
@@ -162,14 +162,16 @@ public class ObjectCircling {
 				touchRight.fetchSample(touchRightSample, 0);
 				if (touchLeftSample[0] != 0 || touchRightSample[0] != 0) {
 					System.out.println("Collision detected");
-					move(-.15f, false);
-					ssample = fetchSonicSample();
-					error = ssample - setDistance;
 
-					rotateAngle((float) (PI / 6.0));
-					move(.10f, false);
-					ssample = fetchSonicSample();
-					newerror = ssample - setDistance;
+					move( -.15f, false);
+                    ssample = fetchSonicSample();
+                    error = ssample - setDistance;
+					
+					rotateAngle( (float) (-PI/6.0));
+					move( .10f, false);
+                    ssample = fetchSonicSample();
+                    newerror = ssample - setDistance;
+
 					left.startSynchronization();
 					right.forward();// left wheel
 					left.forward();// right wheel
@@ -189,18 +191,12 @@ public class ObjectCircling {
 		right.stop();
 		left.stop();
 		left.endSynchronization();
-		Sound.beep();
 
-		move(.1f, true);
-		System.out.println("Final orientation: " + (int) (mOrientation * 180.0 / PI));
-		// turn to face forward
-
-		rotateAngle((float) -mOrientation);
-		Sound.beepSequenceUp();
-
-		// move 0.75m
-		move(.75f, true);
-		Button.ENTER.waitForPressAndRelease();
+		
+		//rotate to face home, go home
+		rotateAngle(-mOrientation - PI/2.0);
+		double distanceToHome = sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1])
+		move(distanceToHome);
 	}
 
 	private static void move(float distanceToGo, boolean wallReturn) {
@@ -208,6 +204,7 @@ public class ObjectCircling {
 	}
 
 	private static void move(float distanceToGo, int speed, boolean wallReturn) {
+		long timestamp = System.nanoTime();
 		left.setSpeed(speed);
 		right.setSpeed(speed);
 		double numRotations = (distanceToGo / (RADIUS * 2.0 * PI));
@@ -231,12 +228,15 @@ public class ObjectCircling {
 					System.out.println("Collision!");
 					Sound.beep();
 					move(-.15f, false);
-					rotateAngle((float) (PI / 2.0));
+
+					rotateAngle((float) (-PI/2.0));
+
 					followWall();
 					break;
 				}
 			}
 		}
+		updateCoordsLinear(timestamp);
 	}
 
 	private static void rotateAngle(float angle) {
@@ -249,9 +249,10 @@ public class ObjectCircling {
 
 		System.out.print((int) (angle * 180.0f / PI) + "degrees");
 		RightwheelRotationSpeedDegrees = right.getRotationSpeed();
-		LeftwheelRotationSpeedDegrees = right.getRotationSpeed();
 
-		if (angle < 0) { // turning left
+		LeftwheelRotationSpeedDegrees = left.getRotationSpeed();
+		
+		if (angle > 0) {	//turning left
 
 			wheelRotationSpeedDegrees = right.getRotationSpeed();
 
@@ -278,7 +279,11 @@ public class ObjectCircling {
 				left.forward();
 			}
 
-		} else { // turning right
+			mRightX = mLeftX + AXLE_LENGTH * (Math.cos(angle + mOrientation - PI/2.0));
+			mRightY = mLeftY + AXLE_LENGTH * (Math.sin(angle + mOrientation - PI/2.0));
+			
+			
+		} else {	//turning right
 			wheelRotationSpeedDegrees = left.getRotationSpeed();
 
 			if (!left.isMoving()) { // sammy is stationary
@@ -304,12 +309,16 @@ public class ObjectCircling {
 				}
 				right.forward();
 			}
+			mLeftX = mRightX + AXLE_LENGTH * (Math.cos(angle + mOrientation - PI/2.0));
+			mLeftY = mRightY + AXLE_LENGTH * (Math.sin(angle + mOrientation - PI/2.0));
 		}
 		left.setSpeed(wheelRotationSpeedDegrees);
 		right.setSpeed(wheelRotationSpeedDegrees);
 		mOrientation += angle;
 		if (mOrientation > (2.0 * PI)) {
-			mOrientation -= PI;
+			mOrientation -= 2.0 * PI;
+		} else if (mOrientation < (-2.0 * PI)) {
+			mOrientation += 2.0 * PI;
 		}
 	}
 
@@ -320,24 +329,27 @@ public class ObjectCircling {
 	private static float calculateAngle(float sonar0, float sonar1, float distanceTravelled) {
 		float angle;
 		float unitAngle = (float) (10 * (PI / 180));
-		float maxAngle = (float) (30 * (PI / 180));
+		float maxAngle = (float) (20 * (PI / 180));
 		float sonarscaler = 100f;
-		if (sonar1 > 0) {// turn left
-			if (unitAngle * (sonar1 * sonarscaler) > maxAngle) {
-				angle = maxAngle * -1;
-			} else {
-				angle = unitAngle * (sonar1 * sonarscaler) * -1;
+
+		if(sonar1>0){//turn left
+			if(unitAngle*(sonar1*sonarscaler) > maxAngle){
+				angle=maxAngle*-1;
+			}else{
+				angle= unitAngle*(sonar1*sonarscaler);
 			}
-		} else {// turn right
-			if (unitAngle * (-1 * sonar1 * sonarscaler) > maxAngle) {
-				angle = maxAngle;
-			} else {
-				angle = unitAngle * (sonar1 * sonarscaler) * -1;
+		}else{//turn right
+			if(unitAngle*(-1*sonar1*sonarscaler) > maxAngle){
+				angle=maxAngle;
+			}else{
+				angle= unitAngle*(sonar1*sonarscaler);
+
 			}
 		}
 		// angle= (float) Math.atan((sonar0 - sonar1)/distanceTravelled);
 		return angle;
 	}
+
 
 	// fetch 3 sonic sample. If they are in an acceptable range, return avarage.
 	// If not, take again
@@ -390,6 +402,26 @@ public class ObjectCircling {
 		if (maxdiff > tol)
 			b = false;
 		return b;
+
+
+	
+	//use this after moving forward in a straight line
+	private static void updateCoordsLinear(long previousTime) {
+		int RightwheelRotationSpeedDegrees = right.getRotationSpeed();
+		int LeftwheelRotationSpeedDegrees = left.getRotationSpeed();
+		assert (RightwheelRotationSpeedDegrees == LeftwheelRotationSpeedDegrees);
+		double linearSpeed = (LeftwheelRotationSpeedDegrees  * PI / 180.0) * RADIUS;
+		double distance = ((double) (System.nanoTime() - previousTime) / 1000000000.0 ) * linearSpeed;
+		
+		mLeftX += distance * Math.cos(mOrientation);
+		mRightX += distance * Math.cos(mOrientation);
+
+		mLeftY += distance * Math.sin(mOrientation);
+		mRightY += distance * Math.sin(mOrientation);
+	}
+	
+	private static double[] getCenterCoords(){
+		return new double{(mLeftX + mRightX)/2.0, (mLeftY + mRightY)/2.0 }
 
 	}
 

@@ -27,7 +27,7 @@ public class ObjectCircling {
 	static double mRightX = 0.0;
 	static double mRightY = 0.0;
 	static boolean mHasExitedHitpoint = false;
-	static double mHitpoint = new double[2];
+	static double[] mHitpoint = new double[2];
 	static EV3MediumRegulatedMotor left;
 	static EV3MediumRegulatedMotor right;
 	static SensorMode touchLeft;
@@ -75,12 +75,12 @@ public class ObjectCircling {
 		left.stop();
 		left.endSynchronization();
 		updateCoordsLinear(timestamp);
-		mHitpoint = getCenterCoords();
 
 		//back up 15cm
 		Sound.beep();
 		System.out.println("Moving Backwards");
 		move(-.15f, false);
+		mHitpoint = getCenterCoords();
 //		Button.ENTER.waitForPressAndRelease();
 //		double numRotations = ( .15 / (RADIUS * 2 * PI));
 //		int angle = (int) (-360.0 * numRotations);
@@ -96,8 +96,6 @@ public class ObjectCircling {
 		Sound.beep();
 		
 		followWall();
-		
-
 	}
 	
 	private static void followWall() {
@@ -134,8 +132,8 @@ public class ObjectCircling {
 			System.out.print("E " + newerror + " " + errordiff+ " ");
 
 			//according to the error difference, adjust the angle with one wheel set to speed 0
-			if ( mHasExcitedHitpoint && (Math.abs(getCenterCoords()[0] - mHitpoint[0]) < .15) 
-					&&  (Math.abs(getCenterCoords()[1] - mHitpoint[0]) < .15{//end of the wall, break loop
+			if ( mHasExitedHitpoint && (Math.abs(getCenterCoords()[0] - mHitpoint[0]) < .15) 
+					&&  (Math.abs(getCenterCoords()[1] - mHitpoint[0]) < .15)){//end of the wall, break loop
 				break;
 			}else {
 				if(newerror< -1*setbuffer || newerror> setbuffer){//if drifting left from the offset turn right
@@ -165,7 +163,7 @@ public class ObjectCircling {
 					sonic.fetchSample(sonicSample, 0);
 					error = sonicSample[0] - setDistance;	
 					
-					rotateAngle( (float) (-PI/6.0));
+					rotateAngle( (float) (-PI/4.0));
 					move( .10f, false);
 					sonic.fetchSample(sonicSample, 0);
 					newerror = sonicSample[0] - setDistance;			
@@ -190,9 +188,9 @@ public class ObjectCircling {
 		left.endSynchronization();
 		
 		//rotate to face home, go home
-		rotateAngle(-mOrientation - PI/2.0);
-		double distanceToHome = sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1])
-		move(distanceToHome);
+		rotateAngle((float) (-mOrientation - PI/2.0));
+		float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
+		move(distanceToHome, false);
 	}
 	
 	private static void move(float distanceToGo, boolean wallReturn) {
@@ -256,7 +254,7 @@ public class ObjectCircling {
 				right.setSpeed(wheelRotationSpeedDegrees);
 				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
-				timeToRotate = (long) ( -angle / desiredAngularVelocity * 1000000000.0) + System.nanoTime(); 
+				timeToRotate = (long) ( angle / desiredAngularVelocity * 1000000000.0) + System.nanoTime(); 
 				right.forward();
 				while(System.nanoTime() < timeToRotate) {
 					right.forward();
@@ -266,7 +264,7 @@ public class ObjectCircling {
 			} else { //sammie was originally moving
 				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
-				timeToRotate = (long) ( -angle / desiredAngularVelocity * 1000000000.0) + System.nanoTime(); 
+				timeToRotate = (long) ( angle / desiredAngularVelocity * 1000000000.0) + System.nanoTime(); 
 				left.stop();
 				while(System.nanoTime() < timeToRotate) {
 				}
@@ -285,7 +283,7 @@ public class ObjectCircling {
 				left.setSpeed(wheelRotationSpeedDegrees);
 				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
-				timeToRotate = (long) ( angle / desiredAngularVelocity * 1000000000.0)  + System.nanoTime(); 
+				timeToRotate = (long) ( -angle / desiredAngularVelocity * 1000000000.0)  + System.nanoTime(); 
 				// System.out.print("T " + timeToRotate + "  ");
 				left.forward();
 				while(System.nanoTime() < timeToRotate) {
@@ -296,7 +294,7 @@ public class ObjectCircling {
 			} else {
 				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
-				timeToRotate = (long) (angle / desiredAngularVelocity * 1000000000.0)  + System.nanoTime(); 
+				timeToRotate = (long) (-angle / desiredAngularVelocity * 1000000000.0)  + System.nanoTime(); 
 				right.stop();
 				while(System.nanoTime() < timeToRotate) {
 				}
@@ -325,7 +323,7 @@ public class ObjectCircling {
 		float sonarscaler = 100f;
 		if(sonar1>0){//turn left
 			if(unitAngle*(sonar1*sonarscaler) > maxAngle){
-				angle=maxAngle*-1;
+				angle=maxAngle*1;
 			}else{
 				angle= unitAngle*(sonar1*sonarscaler);
 			}
@@ -333,7 +331,7 @@ public class ObjectCircling {
 			if(unitAngle*(-1*sonar1*sonarscaler) > maxAngle){
 				angle=maxAngle;
 			}else{
-				angle= unitAngle*(sonar1*sonarscaler);
+				angle= -unitAngle*(sonar1*sonarscaler);
 			}
 		}
 		//angle= (float) Math.atan((sonar0 - sonar1)/distanceTravelled);
@@ -353,10 +351,17 @@ public class ObjectCircling {
 
 		mLeftY += distance * Math.sin(mOrientation);
 		mRightY += distance * Math.sin(mOrientation);
+		
+		//if it hasn't left the initialized hitpoint yet
+		if (!mHasExitedHitpoint && (mHitpoint[0] != 0.0 || mHitpoint[1] != 0.0)){
+			if(Math.abs(mHitpoint[0] - getCenterCoords()[0]) < .15 || Math.abs(mHitpoint[1] - getCenterCoords()[1]) < .15){
+				mHasExitedHitpoint = true;
+			}
+		}
 	}
 	
 	private static double[] getCenterCoords(){
-		return new double{(mLeftX + mRightX)/2.0, (mLeftY + mRightY)/2.0 }
+		return new double[]{(mLeftX + mRightX)/2.0, (mLeftY + mRightY)/2.0 };
 	}
 
 }

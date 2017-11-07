@@ -21,8 +21,8 @@ public class ObjectCircling {
 	final static double AXLE_LENGTH = .122;
 	
 	static double mOrientation = PI/ 2.0;
-	static double mLeftX = 0.0;
-	static double mLeftY = 0.0;
+	static double mLeftX = -AXLE_LENGTH/2.0;
+	static double mLeftY = AXLE_LENGTH/2.0;
 	static double mRightX = 0.0;
 	static double mRightY = 0.0;
 	static boolean mHasExitedHitpoint = false;
@@ -80,7 +80,8 @@ public class ObjectCircling {
 		Sound.beep();
 		System.out.println("Moving Backwards");
 		move(-.15f, false);
-		mHitpoint = getCenterCoords();
+		mHitpoint = getCenterCoords();	
+		System.out.println("Hitpoint Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
 //		Button.ENTER.waitForPressAndRelease();
 //		double numRotations = ( .15 / (RADIUS * 2 * PI));
 //		int angle = (int) (-360.0 * numRotations);
@@ -181,6 +182,7 @@ public class ObjectCircling {
 			error = newerror;
 			left.setSpeed(initspeed);
 			right.setSpeed(initspeed);
+
 
 			ssample = fetchSonicSample();
 			touchLeft.fetchSample(touchLeftSample, 0);
@@ -410,33 +412,33 @@ public class ObjectCircling {
 	//use this after moving forward in a straight line
 	private static void updateCoordsLinear(long previousTime) {
 		if (!mHasExitedHitpoint && (mHitpoint[0] != 0.0 || mHitpoint[1] != 0.0)){
-			if(Math.abs(mHitpoint[0] - getCenterCoords()[0]) < .2 && Math.abs(mHitpoint[1] - getCenterCoords()[1]) < .2){
+			if(Math.abs(mHitpoint[0] - getCenterCoords()[0]) > .2 || Math.abs(mHitpoint[1] - getCenterCoords()[1]) > .2){
 				mHasExitedHitpoint = true;
 				System.out.println("Exited Hit Bubble");
 				Sound.beep();
 			}
 		}
 		
-		int RightwheelRotationSpeedDegrees = right.getRotationSpeed();
-		int LeftwheelRotationSpeedDegrees = left.getRotationSpeed();
+		double RightwheelRotationSpeedDegrees = (double) right.getRotationSpeed();
+		double LeftwheelRotationSpeedDegrees = (double) left.getRotationSpeed();
 		assert (RightwheelRotationSpeedDegrees == LeftwheelRotationSpeedDegrees);
 		double linearSpeed = (LeftwheelRotationSpeedDegrees  * PI / 180.0) * RADIUS;
 		double distance = ((double) (System.nanoTime() - previousTime) / 1000000000.0 ) * linearSpeed;
 		
+		System.out.println("distance is " + distance);
 		mLeftX += distance * Math.cos(mOrientation);
 		mRightX += distance * Math.cos(mOrientation);
 
 		mLeftY += distance * Math.sin(mOrientation);
 		mRightY += distance * Math.sin(mOrientation);
 		
-		if(mHasExitedHitpoint){
-			System.out.println("Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
-		}
+		// if(mHasExitedHitpoint){
+//			System.out.println("Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
+		// }
 		//if it hasn't left the initialized hitpoint yet
 	}
 	
 	private static double[] getCenterCoords(){
 		return new double[]{(mLeftX + mRightX)/2.0, (mLeftY + mRightY)/2.0 };
 	}
-
 }

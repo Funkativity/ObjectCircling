@@ -15,15 +15,14 @@ import static java.lang.Math.*;
 public class ObjectCircling {
 
 	final static double RADIUS = .0275; // RADIUS of the tires in meters
-	final static double PI = 3.14159265358979385626433;
 	final static float SONAR_OFFSET = .022f; // how far the sonar is from front
 												// of robut
 	final static double AXLE_LENGTH = .122;
 	
-	static double mOrientation = PI/ 2.0;
+	static double mOrientation = Math.PI/ 2.0;
 	static double mLeftX = -AXLE_LENGTH/2.0;
-	static double mLeftY = AXLE_LENGTH/2.0;
-	static double mRightX = 0.0;
+	static double mLeftY = 0;
+	static double mRightX = AXLE_LENGTH/2.0;;
 	static double mRightY = 0.0;
 	static boolean mHasExitedHitpoint = false;
 	static double[] mHitpoint = new double[2];
@@ -39,8 +38,8 @@ public class ObjectCircling {
 	
 
 	public static void main(String[] args) {
-		System.out.println(sin(PI/2.0));
-		System.out.println(cos(PI/2.0));
+		System.out.println(sin(Math.PI/2.0));
+		System.out.println(cos(Math.PI/2.0));
 		left = new EV3MediumRegulatedMotor(MotorPort.A);
 		right = new EV3MediumRegulatedMotor(MotorPort.D);
 		left.synchronizeWith(new EV3MediumRegulatedMotor[] { right });
@@ -86,7 +85,7 @@ public class ObjectCircling {
 		System.out.println("Hitpoint Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
 		Button.ENTER.waitForPressAndRelease();
 //		Button.ENTER.waitForPressAndRelease();
-//		double numRotations = ( .15 / (RADIUS * 2 * PI));
+//		double numRotations = ( .15 / (RADIUS * 2 * Math.PI));
 //		int angle = (int) (-360.0 * numRotations);
 //		left.startSynchronization();
 //		left.rotate(angle, false);
@@ -97,7 +96,7 @@ public class ObjectCircling {
 		//turn right 
 		System.out.println("turn right");
 
-		rotateAngle((float) (-PI/2.0));
+		rotateAngle((float) (-Math.PI/2.0));
 		Sound.beep();
 
 		followWall();
@@ -151,7 +150,7 @@ public class ObjectCircling {
 			// } else if(abs(errordiff) > setbuffer){
 			// //adjust angle
 			// //calculate distance traveled
-			// distanceTraveled = (float) ( initspeed * travelTime*0.001 * (PI /
+			// distanceTraveled = (float) ( initspeed * travelTime*0.001 * (Math.PI /
 			// 360) * RADIUS); //m
 			// System.out.print("D " + distanceTraveled + " " );//15.118915
 			// adjustAngle = calculateAngle(error, newerror,distanceTraveled );
@@ -164,13 +163,15 @@ public class ObjectCircling {
 				touchLeft.fetchSample(touchLeftSample, 0);
 				touchRight.fetchSample(touchRightSample, 0);
 				if (touchLeftSample[0] != 0 || touchRightSample[0] != 0) {
+					Sound.beep();
+					Button.ENTER.waitForPressAndRelease();
 					System.out.println("Collision detected");
 
 					move( -.15f, false);
                     ssample = fetchSonicSample();
                     error = ssample - setDistance;
 					
-					rotateAngle( (float) (-PI/4.0));
+					rotateAngle( (float) (-Math.PI/4.0));
 					move( .10f, false);
                     ssample = fetchSonicSample();
                     newerror = ssample - setDistance;
@@ -199,7 +200,7 @@ public class ObjectCircling {
 
 		System.out.println("Going home!");
 		//rotate to face home, go home
-		rotateAngle((float) (-mOrientation - PI/2.0));
+		rotateAngle((float) (-mOrientation - Math.PI/2.0));
 		float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
 		move(distanceToHome, false);
 	}
@@ -212,7 +213,7 @@ public class ObjectCircling {
 		long timestamp = System.nanoTime();
 		left.setSpeed(speed);
 		right.setSpeed(speed);
-		double numRotations = (distanceToGo / (RADIUS * 2.0 * PI));
+		double numRotations = (distanceToGo / (RADIUS * 2.0 * Math.PI));
 		int angle = (int) (360.0 * numRotations);
 		// System.out.println("moving wheels " + angle + " degrees ");
 
@@ -234,7 +235,7 @@ public class ObjectCircling {
 					Sound.beep();
 					move(-.15f, false);
 
-					rotateAngle((float) (-PI/2.0));
+					rotateAngle((float) (-Math.PI/2.0));
 
 					followWall();
 					break;
@@ -252,7 +253,7 @@ public class ObjectCircling {
 		int wheelRotationSpeedDegrees, RightwheelRotationSpeedDegrees, LeftwheelRotationSpeedDegrees;
 		float wheelRotationSpeedRadians;
 
-		// System.out.print((int) (angle * 180.0f / PI) + "degrees");
+		// System.out.print((int) (angle * 180.0f / Math.PI) + "degrees");
 		RightwheelRotationSpeedDegrees = right.getRotationSpeed();
 
 		LeftwheelRotationSpeedDegrees = left.getRotationSpeed();
@@ -265,7 +266,7 @@ public class ObjectCircling {
 				// System.out.println("stationary left turn");
 				wheelRotationSpeedDegrees = 180;
 				right.setSpeed(wheelRotationSpeedDegrees);
-				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * PI / 180.0);
+				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * Math.PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
 				timeToRotate = (long) ( angle / desiredAngularVelocity * 1000000000.0) + System.nanoTime(); 
 				right.forward();
@@ -275,7 +276,7 @@ public class ObjectCircling {
 				right.stop();
 				
 			} else { //sammie was originally moving
-				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * PI / 180.0);
+				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * Math.PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
 				timeToRotate = (long) ( angle / desiredAngularVelocity * 1000000000.0) + System.nanoTime(); 
 				left.stop();
@@ -284,8 +285,8 @@ public class ObjectCircling {
 				left.forward();
 			}
 
-			mRightX = mLeftX + AXLE_LENGTH * (Math.cos(angle + mOrientation - PI/2.0));
-			mRightY = mLeftY + AXLE_LENGTH * (Math.sin(angle + mOrientation - PI/2.0));
+			mRightX = mLeftX + AXLE_LENGTH * (Math.cos(angle + mOrientation - Math.PI/2.0));
+			mRightY = mLeftY + AXLE_LENGTH * (Math.sin(angle + mOrientation - Math.PI/2.0));
 			
 			
 		} else {	//turning right
@@ -295,7 +296,7 @@ public class ObjectCircling {
 				// System.out.println("stationary right turn");
 				wheelRotationSpeedDegrees = 180;
 				left.setSpeed(wheelRotationSpeedDegrees);
-				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * PI / 180.0);
+				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * Math.PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
 				timeToRotate = (long) ( -angle / desiredAngularVelocity * 1000000000.0)  + System.nanoTime(); 
 				// System.out.print("T " + timeToRotate + "  ");
@@ -307,7 +308,7 @@ public class ObjectCircling {
 
 			} else {
 
-				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * PI / 180.0);
+				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * Math.PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
 				timeToRotate = (long) (-angle / desiredAngularVelocity * 1000000000.0)  + System.nanoTime(); 
 				right.stop();
@@ -315,16 +316,16 @@ public class ObjectCircling {
 				}
 				right.forward();
 			}
-			mLeftX = mRightX + AXLE_LENGTH * (Math.cos(angle + mOrientation - PI/2.0));
-			mLeftY = mRightY + AXLE_LENGTH * (Math.sin(angle + mOrientation - PI/2.0));
+			mLeftX = mRightX + AXLE_LENGTH * (Math.cos(angle + mOrientation - Math.PI/2.0));
+			mLeftY = mRightY + AXLE_LENGTH * (Math.sin(angle + mOrientation - Math.PI/2.0));
 		}
 		left.setSpeed(wheelRotationSpeedDegrees);
 		right.setSpeed(wheelRotationSpeedDegrees);
 		mOrientation += angle;
-		if (mOrientation > (2.0 * PI)) {
-			mOrientation -= 2.0 * PI;
-		} else if (mOrientation < (-2.0 * PI)) {
-			mOrientation += 2.0 * PI;
+		if (mOrientation > (2.0 * Math.PI)) {
+			mOrientation -= 2.0 * Math.PI;
+		} else if (mOrientation < (-2.0 * Math.PI)) {
+			mOrientation += 2.0 * Math.PI;
 		}
 	}
 
@@ -334,8 +335,8 @@ public class ObjectCircling {
 	// positive values mean going towards object
 	private static float calculateAngle(float sonar0, float sonar1, float distanceTravelled) {
 		float angle;
-		float unitAngle = (float) (10 * (PI / 180));
-		float maxAngle = (float) (20 * (PI / 180));
+		float unitAngle = (float) (10 * (Math.PI / 180));
+		float maxAngle = (float) (20 * (Math.PI / 180));
 		float sonarscaler = 100f;
 
 		if(sonar1>0){//turn left
@@ -425,7 +426,7 @@ public class ObjectCircling {
 		double RightwheelRotationSpeedDegrees = (double) right.getRotationSpeed();
 		double LeftwheelRotationSpeedDegrees = (double) left.getRotationSpeed();
 		assert (RightwheelRotationSpeedDegrees == LeftwheelRotationSpeedDegrees);
-		double linearSpeed = (LeftwheelRotationSpeedDegrees  * PI / 180.0) * RADIUS;
+		double linearSpeed = (LeftwheelRotationSpeedDegrees  * Math.PI / 180.0) * RADIUS;
 		double distance = (((double) (System.nanoTime() - previousTime)) / 1000000000.0 ) * linearSpeed;
 		
 		System.out.println("distance is " + distance);

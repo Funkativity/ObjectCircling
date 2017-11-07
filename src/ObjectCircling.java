@@ -471,7 +471,7 @@ public class ObjectCircling {
 	
 	private static boolean isBackHome() {
 		boolean isHome = mHasExitedHitpoint && getDistance(getCenterCoords(), mHitpoint) < .2f;
-		isHome = isHome && ((Math.abs(mOrientation) < PI/4.0) || (mOrientation > 7.0 * PI/4.0); 
+		isHome = isHome && ((Math.abs(mOrientation) < PI/4.0) || (mOrientation > 7.0 * PI/4.0)); 
 		return isHome;
 	}
 }

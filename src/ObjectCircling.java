@@ -27,6 +27,7 @@ public class ObjectCircling {
 	static boolean mHasExitedHitpoint = false;
 	static double[] mHitpoint = new double[2];
 
+
 	static double[] mStart = new double[2];
 
 	static EV3MediumRegulatedMotor left;
@@ -55,6 +56,7 @@ public class ObjectCircling {
 		touchLeftSample = new float[touchLeft.sampleSize()];
 		touchRightSample = new float[touchRight.sampleSize()];
 		sonicSample = new float[sonic.sampleSize()];
+
 
 		mStart=getCenterCoords();
 
@@ -146,7 +148,12 @@ public class ObjectCircling {
 
             //according to the error difference, adjust the angle with one wheel set to speed 0
 
+
 			if (isBackHome()){//end of the wall, break loopn
+
+
+			if ( mHasExitedHitpoint && (Math.abs(getCenterCoords()[0] - mHitpoint[0]) < .25) 
+					&&  (Math.abs(getCenterCoords()[1] - mHitpoint[0]) < .25)){//end of the wall, break loopn
 
 				break;
 			}else if(isAlmostHome() && !almosthome){
@@ -154,6 +161,7 @@ public class ObjectCircling {
 				almosthome=true;
 				
 			}else if(almosthome && oops()){
+
 				break;
 			}
 			else {
@@ -235,6 +243,9 @@ public class ObjectCircling {
 		rotateAngle((float) (angleHome));
 		float distanceToHome = getDistance(getCenterCoords(),mStart);
 		//float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
+
+		rotateAngle((float) (-mOrientation - Math.PI/2.0));
+		float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
 
 		move(distanceToHome, false);
 	}
@@ -514,4 +525,6 @@ public class ObjectCircling {
 		
 	}
 
+
 }
+

@@ -430,7 +430,7 @@ public class ObjectCircling {
 		mRightY += distance * Math.sin(mOrientation);
 		
 		if(mHasExitedHitpoint){
-			System.out.println("Coords: " + String.format("%.5g%n", getCenterCoords()[0]) + ", " + String.format("%.5g%n", getCenterCoords()[1]));
+			System.out.println("Coords: " + String.format("%.3g%n", getCenterCoords()[0]) + ", " + String.format("%.3g%n", getCenterCoords()[1]));
 		}
 		//if it hasn't left the initialized hitpoint yet
 	}

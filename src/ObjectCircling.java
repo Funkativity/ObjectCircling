@@ -143,6 +143,7 @@ public class ObjectCircling {
 			if (isBackHome()){//end of the wall, break loopn
 				break;
 			}else if(isAlmostHome() && !almosthome){
+				Sound.twoBeeps();
 				almosthome=true;
 				
 			}else if(almosthome && oops()){
@@ -483,11 +484,11 @@ public class ObjectCircling {
 		return isHome;
 	}
 	private static boolean isAlmostHome() {
-		boolean isalmostHome = mHasExitedHitpoint && getDistance(getCenterCoords(), mHitpoint) < .4f;
+		boolean isalmostHome = mHasExitedHitpoint && getDistance(getCenterCoords(), mHitpoint) < .35f && getCenterCoords()[0]<0;
 		return isalmostHome;
 	}
 	private static boolean oops(){
-		boolean oops = mHasExitedHitpoint &&  getDistance(getCenterCoords(), mHitpoint) > .6f;
+		boolean oops = mHasExitedHitpoint &&  getDistance(getCenterCoords(), mHitpoint) > .5f;
 		return oops ;
 		
 	}

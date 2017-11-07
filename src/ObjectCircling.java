@@ -185,13 +185,14 @@ public class ObjectCircling {
 			ssample = fetchSonicSample();
 			touchLeft.fetchSample(touchLeftSample, 0);
 			touchRight.fetchSample(touchRightSample, 0);
+			updateCoordsLinear(timestamp);
 		}
 		left.startSynchronization();
 		right.stop();
 		left.stop();
 		left.endSynchronization();
 
-		
+		System.out.println("Going home!");
 		//rotate to face home, go home
 		rotateAngle((float) (-mOrientation - PI/2.0));
 		float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
@@ -408,6 +409,14 @@ public class ObjectCircling {
 	
 	//use this after moving forward in a straight line
 	private static void updateCoordsLinear(long previousTime) {
+		if (!mHasExitedHitpoint && (mHitpoint[0] != 0.0 || mHitpoint[1] != 0.0)){
+			if(Math.abs(mHitpoint[0] - getCenterCoords()[0]) < .15 || Math.abs(mHitpoint[1] - getCenterCoords()[1]) < .15){
+				mHasExitedHitpoint = true;
+				System.out.println("Exited Hit Bubble");
+				Sound.beep();
+			}
+		}
+		
 		int RightwheelRotationSpeedDegrees = right.getRotationSpeed();
 		int LeftwheelRotationSpeedDegrees = left.getRotationSpeed();
 		assert (RightwheelRotationSpeedDegrees == LeftwheelRotationSpeedDegrees);
@@ -421,16 +430,9 @@ public class ObjectCircling {
 		mRightY += distance * Math.sin(mOrientation);
 		
 		if(mHasExitedHitpoint){
-			System.out.println("Coords: " + getCenterCoords[0] + ", " + getCenterCoords[1]);
+			System.out.println("Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
 		}
 		//if it hasn't left the initialized hitpoint yet
-		if (!mHasExitedHitpoint && (mHitpoint[0] != 0.0 || mHitpoint[1] != 0.0)){
-			if(Math.abs(mHitpoint[0] - getCenterCoords()[0]) < .15 || Math.abs(mHitpoint[1] - getCenterCoords()[1]) < .15){
-				mHasExitedHitpoint = true;
-				System.out.println("Exited Hit Bubble");
-				Sound.beep();
-			}
-		}
 	}
 	
 	private static double[] getCenterCoords(){

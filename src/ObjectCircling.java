@@ -27,7 +27,10 @@ public class ObjectCircling {
 	static boolean mHasExitedHitpoint = false;
 	static double[] mHitpoint = new double[2];
 <<<<<<< HEAD
+<<<<<<< HEAD
 	static double[] mStart = new double[2];
+=======
+>>>>>>> parent of 213cfc7... update return home
 =======
 >>>>>>> parent of 213cfc7... update return home
 	static EV3MediumRegulatedMotor left;
@@ -58,7 +61,10 @@ public class ObjectCircling {
 		sonicSample = new float[sonic.sampleSize()];
 		// start and head forward
 <<<<<<< HEAD
+<<<<<<< HEAD
 		mStart=getCenterCoords();
+=======
+>>>>>>> parent of 213cfc7... update return home
 =======
 >>>>>>> parent of 213cfc7... update return home
 		Sound.beep();
@@ -90,7 +96,11 @@ public class ObjectCircling {
 		System.out.println("Moving Backwards");
 		move(-.15f, false);
 <<<<<<< HEAD
+<<<<<<< HEAD
 		mHitpoint = getCenterCoords();
+=======
+		mHitpoint = getCenterCoords();	
+>>>>>>> parent of 213cfc7... update return home
 =======
 		mHitpoint = getCenterCoords();	
 >>>>>>> parent of 213cfc7... update return home
@@ -151,6 +161,7 @@ public class ObjectCircling {
 
             //according to the error difference, adjust the angle with one wheel set to speed 0
 <<<<<<< HEAD
+<<<<<<< HEAD
 			if (isBackHome()){//end of the wall, break loopn
 =======
 			if ( mHasExitedHitpoint && (Math.abs(getCenterCoords()[0] - mHitpoint[0]) < .25) 
@@ -162,6 +173,10 @@ public class ObjectCircling {
 				almosthome=true;
 				
 			}else if(almosthome && oops()){
+=======
+			if ( mHasExitedHitpoint && (Math.abs(getCenterCoords()[0] - mHitpoint[0]) < .25) 
+					&&  (Math.abs(getCenterCoords()[1] - mHitpoint[0]) < .25)){//end of the wall, break loopn
+>>>>>>> parent of 213cfc7... update return home
 				break;
 			}
 			else {
@@ -228,6 +243,7 @@ public class ObjectCircling {
 		System.out.println("Going home! " + mOrientation);
 		//rotate to face home, go home
 <<<<<<< HEAD
+<<<<<<< HEAD
 		double angleHome =  -(Math.atan2(getCenterCoords()[0], getCenterCoords()[1]) - mOrientation); 
 		while (angleHome > 2.0 * Math.PI) {
 			angleHome -= 2.0 * Math.PI;
@@ -243,6 +259,10 @@ public class ObjectCircling {
 		rotateAngle((float) (angleHome));
 		float distanceToHome = getDistance(getCenterCoords(),mStart);
 		//float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
+=======
+		rotateAngle((float) (-mOrientation - Math.PI/2.0));
+		float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
+>>>>>>> parent of 213cfc7... update return home
 =======
 		rotateAngle((float) (-mOrientation - Math.PI/2.0));
 		float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
@@ -503,6 +523,7 @@ public class ObjectCircling {
 		return new double[]{(mLeftX + mRightX)/2.0, (mLeftY + mRightY)/2.0 };
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 	private static float getDistance(double[] p1,double[] p2){
 		float d;
@@ -524,6 +545,8 @@ public class ObjectCircling {
 		return oops ;
 		
 	}
+=======
+>>>>>>> parent of 213cfc7... update return home
 =======
 >>>>>>> parent of 213cfc7... update return home
 }

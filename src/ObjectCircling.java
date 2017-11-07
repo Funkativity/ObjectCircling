@@ -26,7 +26,9 @@ public class ObjectCircling {
 	static double mRightY = 0.0;
 	static boolean mHasExitedHitpoint = false;
 	static double[] mHitpoint = new double[2];
+
 	static double[] mStart = new double[2];
+
 	static EV3MediumRegulatedMotor left;
 	static EV3MediumRegulatedMotor right;
 	static SensorMode touchLeft;
@@ -53,8 +55,9 @@ public class ObjectCircling {
 		touchLeftSample = new float[touchLeft.sampleSize()];
 		touchRightSample = new float[touchRight.sampleSize()];
 		sonicSample = new float[sonic.sampleSize()];
-		// start and head forward
+
 		mStart=getCenterCoords();
+
 		Sound.beep();
 		Button.ENTER.waitForPressAndRelease();
 		System.out.println("Moving forward");
@@ -83,7 +86,9 @@ public class ObjectCircling {
 		Sound.beep();
 		System.out.println("Moving Backwards");
 		move(-.15f, false);
+
 		mHitpoint = getCenterCoords();
+
 		System.out.println("Hitpoint Coords: " + getCenterCoords()[0] + ", " + getCenterCoords()[1]);
 		// Button.ENTER.waitForPressAndRelease();
 //		Button.ENTER.waitForPressAndRelease();
@@ -107,7 +112,7 @@ public class ObjectCircling {
 	private static void followWall() {
 		// wall following (Bang Bang)
 		float setDistance = .10f;
-		float initspeed = 160f;
+		float initspeed = 180f;
 		float error = 0f;
 		float newerror = 0f;
 		float errordiff = 0f;
@@ -140,7 +145,9 @@ public class ObjectCircling {
 			// System.out.print("E " + newerror + " " + errordiff + " ");
 
             //according to the error difference, adjust the angle with one wheel set to speed 0
+
 			if (isBackHome()){//end of the wall, break loopn
+
 				break;
 			}else if(isAlmostHome() && !almosthome){
 				Sound.twoBeeps();
@@ -177,12 +184,12 @@ public class ObjectCircling {
 					Sound.beep();
 					System.out.println("Collision detected");
 
-					move( -.15f,160, false);
+					move( -.15f, false);
                     ssample = fetchSonicSample();
                     error = ssample - setDistance;
 					
-					rotateAngle( (float) (-Math.PI/3.0));
-					move( .10f,160, false);
+					rotateAngle( (float) (-Math.PI/4.0));
+					move( .10f, false);
                     ssample = fetchSonicSample();
                     newerror = ssample - setDistance;
 
@@ -205,14 +212,14 @@ public class ObjectCircling {
 			updateCoordsLinear(timestamp);
 			timestamp = System.nanoTime();
 		}
-		System.out.println("Going home! " + mOrientation);
 		left.startSynchronization();
 		right.stop();
 		left.stop();
 		left.endSynchronization();
-		Sound.beep();
-		
+
+		System.out.println("Going home! " + mOrientation);
 		//rotate to face home, go home
+
 		double angleHome =  -(Math.atan2(getCenterCoords()[0], getCenterCoords()[1]) - mOrientation); 
 		while (angleHome > 2.0 * Math.PI) {
 			angleHome -= 2.0 * Math.PI;
@@ -228,6 +235,7 @@ public class ObjectCircling {
 		rotateAngle((float) (angleHome));
 		float distanceToHome = getDistance(getCenterCoords(),mStart);
 		//float distanceToHome = (float) sqrt(mHitpoint[0] * mHitpoint[0] +  mHitpoint[1] * mHitpoint[1]);
+
 		move(distanceToHome, false);
 	}
 
@@ -283,14 +291,14 @@ public class ObjectCircling {
 		RightwheelRotationSpeedDegrees = right.getRotationSpeed();
 
 		LeftwheelRotationSpeedDegrees = left.getRotationSpeed();
-		System.out.println(LeftwheelRotationSpeedDegrees);
+		
 		if (angle > 0) {	//turning left
 			System.out.println("Going left");
 			wheelRotationSpeedDegrees = right.getRotationSpeed();
 
 			if (!right.isMoving()) { // sammy is stationary
 				System.out.println("stationary left turn");
-				wheelRotationSpeedDegrees = 160;
+				wheelRotationSpeedDegrees = 180;
 				right.setSpeed(wheelRotationSpeedDegrees);
 				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * Math.PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
@@ -320,7 +328,7 @@ public class ObjectCircling {
 			System.out.println("Going right!");
 			if (!left.isMoving()) { // sammy is stationary
 				System.out.println("stationary right turn");
-				wheelRotationSpeedDegrees = 160;
+				wheelRotationSpeedDegrees = 180;
 				left.setSpeed(wheelRotationSpeedDegrees);
 				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * Math.PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
@@ -333,7 +341,7 @@ public class ObjectCircling {
 				left.stop();
 
 			} else {
-				System.out.println("non-stationary right turn");
+
 				wheelRotationSpeedRadians = (float) (wheelRotationSpeedDegrees  * Math.PI / 180.0);
 				desiredAngularVelocity = (float) (( wheelRotationSpeedRadians * RADIUS) / AXLE_LENGTH) ;
 				timeToRotate = (long) (-angle / desiredAngularVelocity * 1000000000.0)  + System.nanoTime(); 
@@ -484,6 +492,7 @@ public class ObjectCircling {
 		return new double[]{(mLeftX + mRightX)/2.0, (mLeftY + mRightY)/2.0 };
 	}
 
+
 	private static float getDistance(double[] p1,double[] p2){
 		float d;
 		d= (float) Math.sqrt((p1[0]-p2[0])*(p1[0]-p2[0]) + (p1[1]-p2[1])*(p1[1]-p2[1]));
@@ -504,4 +513,5 @@ public class ObjectCircling {
 		return oops ;
 		
 	}
+
 }
